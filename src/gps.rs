@@ -13,7 +13,7 @@ pub enum GpsError {
 pub struct Gps(WbDeviceTag);
 
 impl Gps {
-    pub(crate) fn new(device: &WbDeviceTag) -> Self {
+    pub(crate) fn new(device: WbDeviceTag) -> Self {
         assert_eq!(WbNodeType_WB_NODE_GPS, unsafe {
             wb_device_get_node_type(device)
         });
@@ -28,10 +28,10 @@ impl Gps {
         unsafe { wb_gps_disable(self.0) }
     }
 
-    fn grab_data(&self) -> Result<&[f64], GpsError> {
+    pub fn grab_data(&self) -> Result<[f64; 3], GpsError> {
         unsafe {
             let values = wb_gps_get_values(self.0);
-            if pos_ptr.is_null() {
+            if values.is_null() {
                 return Err(GpsError::ValueIsNull);
             }
             Ok([*values.offset(0), *values.offset(1), *values.offset(2)])

@@ -11,8 +11,7 @@ use webots_bindings::{
 };
 
 use crate::{
-    Accelerometer, Brake, Camera, DistanceSensor, Gyro, InertialUnit, Keyboard, Motor,
-    PositionSensor, Receiver, RobotMode, TouchSensor,
+    Accelerometer, Brake, Camera, DistanceSensor, Gps, Gyro, InertialUnit, Keyboard, Motor, PositionSensor, Receiver, RobotMode, TouchSensor
 };
 
 pub struct Robot;
@@ -145,6 +144,12 @@ impl Robot {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
         Camera::new(device)
+    }
+
+    pub fn get_gps(name: &str) -> Gps {
+        let name = CString::new(name).expect("CString::new failed");
+        let device = unsafe { wb_robot_get_device(name.as_ptr()) };
+        Gps::new(device)
     }
 
     pub fn get_distance_sensor(name: &str) -> DistanceSensor {

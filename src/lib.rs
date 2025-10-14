@@ -15,6 +15,7 @@ mod robot;
 mod robot_mode;
 mod touch_sensor;
 mod touch_sensor_type;
+mod gps;
 
 pub use accelerometer::Accelerometer;
 pub use brake::Brake;
@@ -33,3 +34,4 @@ pub use robot::Robot;
 pub use robot_mode::RobotMode;
 pub use touch_sensor::TouchSensor;
 pub use touch_sensor_type::TouchSensorType;
+pub use gps::Gps;
