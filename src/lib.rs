@@ -1,4 +1,5 @@
 mod accelerometer;
+mod lidar;
 mod brake;
 mod camera;
 mod distance_sensor;
@@ -17,6 +18,7 @@ mod touch_sensor;
 mod touch_sensor_type;
 mod gps;
 
+pub use lidar::Lidar;
 pub use accelerometer::Accelerometer;
 pub use brake::Brake;
 pub use camera::Camera;

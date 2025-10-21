@@ -2,16 +2,19 @@ use std::ffi::{CStr, CString};
 
 use webots_bindings::{
     wb_robot_battery_sensor_disable, wb_robot_battery_sensor_enable,
-    wb_robot_battery_sensor_get_sampling_period, wb_robot_battery_sensor_get_value,
-    wb_robot_cleanup, wb_robot_get_basic_time_step, wb_robot_get_custom_data, wb_robot_get_device,
-    wb_robot_get_mode, wb_robot_get_model, wb_robot_get_name, wb_robot_get_project_path,
-    wb_robot_get_supervisor, wb_robot_get_synchronization, wb_robot_get_time, wb_robot_get_urdf,
-    wb_robot_get_world_path, wb_robot_init, wb_robot_set_custom_data, wb_robot_set_mode,
-    wb_robot_step,
+    wb_robot_battery_sensor_get_sampling_period,
+    wb_robot_battery_sensor_get_value, wb_robot_cleanup,
+    wb_robot_get_basic_time_step, wb_robot_get_custom_data,
+    wb_robot_get_device, wb_robot_get_mode, wb_robot_get_model,
+    wb_robot_get_name, wb_robot_get_project_path, wb_robot_get_supervisor,
+    wb_robot_get_synchronization, wb_robot_get_time, wb_robot_get_urdf,
+    wb_robot_get_world_path, wb_robot_init, wb_robot_set_custom_data,
+    wb_robot_set_mode, wb_robot_step,
 };
 
 use crate::{
-    Accelerometer, Brake, Camera, DistanceSensor, Gps, Gyro, InertialUnit, Keyboard, Motor, PositionSensor, Receiver, RobotMode, TouchSensor
+    Accelerometer, Brake, Camera, DistanceSensor, Gps, Gyro, InertialUnit,
+    Keyboard, Lidar, Motor, PositionSensor, Receiver, RobotMode, TouchSensor,
 };
 
 pub struct Robot;
@@ -72,8 +75,8 @@ impl Robot {
     }
 
     pub fn set_custom_data(custom_data: &[u8]) {
-        let custom_data =
-            CStr::from_bytes_with_nul(custom_data).expect("CStr::from_bytes_with_nul failed");
+        let custom_data = CStr::from_bytes_with_nul(custom_data)
+            .expect("CStr::from_bytes_with_nul failed");
         unsafe { wb_robot_set_custom_data(custom_data.as_ptr()) }
     }
 
@@ -144,6 +147,12 @@ impl Robot {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
         Camera::new(device)
+    }
+
+    pub fn get_lidar(name: &str) -> Lidar {
+        let name = CString::new(name).expect("CString::new failed");
+        let device = unsafe { wb_robot_get_device(name.as_ptr()) };
+        Lidar::new(device)
     }
 
     pub fn get_gps(name: &str) -> Gps {

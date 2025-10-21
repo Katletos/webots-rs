@@ -28,7 +28,7 @@ impl Gps {
         unsafe { wb_gps_disable(self.0) }
     }
 
-    pub fn grab_data(&self) -> Result<[f64; 3], GpsError> {
+    pub fn get_values(&self) -> Result<[f64; 3], GpsError> {
         unsafe {
             let values = wb_gps_get_values(self.0);
             if values.is_null() {
