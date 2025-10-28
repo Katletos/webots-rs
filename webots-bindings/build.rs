@@ -4,13 +4,16 @@ use walkdir::WalkDir;
 
 fn main() {
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-    let status = Command::new("rsync")
-        .args(["-a", "webots/", out_path.join("webots/").to_str().unwrap()])
+
+    let status = Command::new("cp")
+        .args(["-R", "webots/", out_path.join("./").to_str().unwrap()])
         .status()
         .expect("Failed to execute rsync process");
+
     if !status.success() {
-        panic!("rsync process exited with {:?}", status.code());
+        panic!("cp process exited with {:?}", status.code());
     }
+
     let status = Command::new("make")
         .args(["release"])
         .env("WEBOTS_HOME", "../../..")
