@@ -7,11 +7,14 @@ use thiserror::Error;
 use webots_bindings::{
     wb_camera_recognition_disable, wb_camera_recognition_disable_segmentation,
     wb_camera_recognition_enable, wb_camera_recognition_enable_segmentation,
-    wb_camera_recognition_get_number_of_objects, wb_camera_recognition_get_objects,
-    wb_camera_recognition_get_sampling_period, wb_camera_recognition_get_segmentation_image,
-    wb_camera_recognition_has_segmentation, wb_camera_recognition_is_segmentation_enabled,
-    wb_camera_recognition_save_segmentation_image, wb_device_get_node_type, WbDeviceTag,
-    WbNodeType_WB_NODE_CAMERA,
+    wb_camera_recognition_get_number_of_objects,
+    wb_camera_recognition_get_objects,
+    wb_camera_recognition_get_sampling_period,
+    wb_camera_recognition_get_segmentation_image,
+    wb_camera_recognition_has_segmentation,
+    wb_camera_recognition_is_segmentation_enabled,
+    wb_camera_recognition_save_segmentation_image, wb_device_get_node_type,
+    WbDeviceTag, WbNodeType_WB_NODE_CAMERA,
 };
 
 use crate::Camera;
@@ -60,7 +63,9 @@ impl Recognition {
         unsafe { wb_camera_recognition_get_number_of_objects(self.0) }
     }
 
-    pub fn get_objects<'a>(&self) -> Result<Vec<RecognitionObject<'a>>, RecognitionError> {
+    pub fn get_objects<'a>(
+        &self,
+    ) -> Result<Vec<RecognitionObject<'a>>, RecognitionError> {
         let number_of_objects = self.get_number_of_objects();
         let objects = unsafe {
             let objects = wb_camera_recognition_get_objects(self.0);
@@ -79,7 +84,12 @@ impl Recognition {
                 position_on_image: object.position_on_image,
                 size_on_image: object.size_on_image,
                 number_of_colors: object.number_of_colors,
-                colors: unsafe { from_raw_parts(object.colors, object.number_of_colors as usize) },
+                colors: unsafe {
+                    from_raw_parts(
+                        object.colors,
+                        object.number_of_colors as usize,
+                    )
+                },
                 model: unsafe { CStr::from_ptr(object.model) }
                     .to_str()
                     .expect("CStr::to_str"),
@@ -115,6 +125,12 @@ impl Recognition {
 
     pub fn save_segmentation_image(&self, filename: &str, quality: i32) -> i32 {
         let filename = CString::new(filename).expect("CString::new failed");
-        unsafe { wb_camera_recognition_save_segmentation_image(self.0, filename.as_ptr(), quality) }
+        unsafe {
+            wb_camera_recognition_save_segmentation_image(
+                self.0,
+                filename.as_ptr(),
+                quality,
+            )
+        }
     }
 }

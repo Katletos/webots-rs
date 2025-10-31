@@ -2,13 +2,15 @@ use std::{ffi::CString, slice::from_raw_parts};
 
 use thiserror::Error;
 use webots_bindings::{
-    wb_camera_disable, wb_camera_enable, wb_camera_get_exposure, wb_camera_get_focal_distance,
-    wb_camera_get_focal_length, wb_camera_get_fov, wb_camera_get_height, wb_camera_get_image,
-    wb_camera_get_max_focal_distance, wb_camera_get_max_fov, wb_camera_get_min_focal_distance,
-    wb_camera_get_min_fov, wb_camera_get_near, wb_camera_get_sampling_period, wb_camera_get_width,
+    wb_camera_disable, wb_camera_enable, wb_camera_get_exposure,
+    wb_camera_get_focal_distance, wb_camera_get_focal_length,
+    wb_camera_get_fov, wb_camera_get_height, wb_camera_get_image,
+    wb_camera_get_max_focal_distance, wb_camera_get_max_fov,
+    wb_camera_get_min_focal_distance, wb_camera_get_min_fov,
+    wb_camera_get_near, wb_camera_get_sampling_period, wb_camera_get_width,
     wb_camera_has_recognition, wb_camera_save_image, wb_camera_set_exposure,
-    wb_camera_set_focal_distance, wb_camera_set_fov, wb_device_get_node_type, WbDeviceTag,
-    WbNodeType_WB_NODE_CAMERA,
+    wb_camera_set_focal_distance, wb_camera_set_fov, wb_device_get_node_type,
+    WbDeviceTag, WbNodeType_WB_NODE_CAMERA,
 };
 
 use crate::Recognition;

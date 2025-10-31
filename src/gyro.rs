@@ -2,8 +2,9 @@ use std::slice::from_raw_parts;
 
 use thiserror::Error;
 use webots_bindings::{
-    wb_device_get_node_type, wb_gyro_disable, wb_gyro_enable, wb_gyro_get_lookup_table,
-    wb_gyro_get_lookup_table_size, wb_gyro_get_sampling_period, wb_gyro_get_values, WbDeviceTag,
+    wb_device_get_node_type, wb_gyro_disable, wb_gyro_enable,
+    wb_gyro_get_lookup_table, wb_gyro_get_lookup_table_size,
+    wb_gyro_get_sampling_period, wb_gyro_get_values, WbDeviceTag,
     WbNodeType_WB_NODE_GYRO,
 };
 

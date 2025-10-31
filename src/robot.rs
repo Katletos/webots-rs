@@ -17,32 +17,94 @@ use crate::{
     Keyboard, Lidar, Motor, PositionSensor, Receiver, RobotMode, TouchSensor,
 };
 
-pub struct Robot;
+pub fn world_time() -> f64 {
+    unsafe { wb_robot_get_time() }
+}
 
-impl Default for Robot {
-    fn default() -> Self {
-        unsafe {
-            wb_robot_init();
+static ROBOT: std::sync::OnceLock<Robot> = std::sync::OnceLock::new();
+
+pub struct WorldLock;
+
+impl WorldLock {
+    pub fn after_step<F, T>(&self, mut f: F) -> T
+    where
+        F: FnMut() -> T,
+    {
+        let robot = Robot::global();
+
+        {
+            robot.world_tick.lock().unwrap().workers += 1;
+            let mut tick = robot
+                .condvar
+                .wait_while(robot.world_tick.lock().unwrap(), |tick| {
+                    tick.in_tick
+                })
+                .unwrap();
+
+            tick.workers -= 1;
         }
-        Self
+
+        robot.condvar.notify_all();
+
+        f()
     }
+}
+
+struct WorldTick {
+    in_tick: bool,
+    workers: usize,
+}
+
+pub struct Robot {
+    init: Option<()>,
+    world_tick: std::sync::Mutex<WorldTick>,
+    condvar: std::sync::Condvar,
 }
 
 impl Drop for Robot {
     fn drop(&mut self) {
-        unsafe {
-            wb_robot_cleanup();
+        if let Some(_) = self.init.take() {
+            unsafe {
+                wb_robot_cleanup();
+            }
+            // Cleanup only if it was initialized
         }
     }
 }
 
 impl Robot {
-    pub fn step(duration: i32) -> i32 {
-        unsafe { wb_robot_step(duration) }
+    pub fn global() -> &'static Robot {
+        ROBOT.get_or_init(|| {
+            let _ = unsafe { wb_robot_init() };
+
+            Robot {
+                world_tick: std::sync::Mutex::new(WorldTick {
+                    in_tick: false,
+                    workers: 0,
+                }),
+                condvar: std::sync::Condvar::new(),
+                init: Some(()),
+            }
+        })
     }
 
-    pub fn get_time() -> f64 {
-        unsafe { wb_robot_get_time() }
+    pub fn step(&self, duration: i32) -> i32 {
+        self.world_tick.lock().unwrap().in_tick = true;
+
+        let status = unsafe { wb_robot_step(duration) };
+
+        self.world_tick.lock().unwrap().in_tick = false;
+
+        self.condvar.notify_all();
+
+        let _tick = self
+            .condvar
+            .wait_while(self.world_tick.lock().unwrap(), |tick| {
+                tick.workers > 0
+            })
+            .unwrap();
+
+        status
     }
 
     pub fn get_urdf(prefix: &str) -> &[u8] {
@@ -149,10 +211,10 @@ impl Robot {
         Camera::new(device)
     }
 
-    pub fn get_lidar(name: &str) -> Lidar {
+    pub fn get_lidar(&self, name: &str) -> Lidar {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Lidar::new(device)
+        Lidar::new(device, WorldLock)
     }
 
     pub fn get_gps(name: &str) -> Gps {

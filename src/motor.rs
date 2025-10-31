@@ -1,20 +1,25 @@
 use webots_bindings::{
-    wb_device_get_node_type, wb_motor_disable_force_feedback, wb_motor_disable_torque_feedback,
-    wb_motor_enable_force_feedback, wb_motor_enable_torque_feedback, wb_motor_get_acceleration,
-    wb_motor_get_available_force, wb_motor_get_available_torque, wb_motor_get_brake,
-    wb_motor_get_force_feedback, wb_motor_get_force_feedback_sampling_period,
-    wb_motor_get_max_force, wb_motor_get_max_position, wb_motor_get_max_torque,
-    wb_motor_get_max_velocity, wb_motor_get_min_position, wb_motor_get_multiplier,
-    wb_motor_get_position_sensor, wb_motor_get_target_position, wb_motor_get_torque_feedback,
-    wb_motor_get_torque_feedback_sampling_period, wb_motor_get_type, wb_motor_get_velocity,
-    wb_motor_set_acceleration, wb_motor_set_available_force, wb_motor_set_available_torque,
-    wb_motor_set_control_pid, wb_motor_set_force, wb_motor_set_position, wb_motor_set_torque,
-    wb_motor_set_velocity, WbDeviceTag, WbNodeType_WB_NODE_LINEAR_MOTOR,
-    WbNodeType_WB_NODE_ROTATIONAL_MOTOR,
+    wb_device_get_node_type, wb_motor_disable_force_feedback,
+    wb_motor_disable_torque_feedback, wb_motor_enable_force_feedback,
+    wb_motor_enable_torque_feedback, wb_motor_get_acceleration,
+    wb_motor_get_available_force, wb_motor_get_available_torque,
+    wb_motor_get_brake, wb_motor_get_force_feedback,
+    wb_motor_get_force_feedback_sampling_period, wb_motor_get_max_force,
+    wb_motor_get_max_position, wb_motor_get_max_torque,
+    wb_motor_get_max_velocity, wb_motor_get_min_position,
+    wb_motor_get_multiplier, wb_motor_get_position_sensor,
+    wb_motor_get_target_position, wb_motor_get_torque_feedback,
+    wb_motor_get_torque_feedback_sampling_period, wb_motor_get_type,
+    wb_motor_get_velocity, wb_motor_set_acceleration,
+    wb_motor_set_available_force, wb_motor_set_available_torque,
+    wb_motor_set_control_pid, wb_motor_set_force, wb_motor_set_position,
+    wb_motor_set_torque, wb_motor_set_velocity, WbDeviceTag,
+    WbNodeType_WB_NODE_LINEAR_MOTOR, WbNodeType_WB_NODE_ROTATIONAL_MOTOR,
 };
 
 use crate::{Brake, JointType, PositionSensor};
 
+#[derive(Clone)]
 pub struct Motor(WbDeviceTag);
 
 impl Motor {

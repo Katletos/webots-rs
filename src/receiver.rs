@@ -2,10 +2,12 @@ use std::slice::from_raw_parts;
 
 use thiserror::Error;
 use webots_bindings::{
-    wb_device_get_node_type, wb_receiver_disable, wb_receiver_enable, wb_receiver_get_channel,
-    wb_receiver_get_data, wb_receiver_get_data_size, wb_receiver_get_emitter_direction,
-    wb_receiver_get_queue_length, wb_receiver_get_sampling_period, wb_receiver_get_signal_strength,
-    wb_receiver_next_packet, wb_receiver_set_channel, WbDeviceTag, WbNodeType_WB_NODE_RECEIVER,
+    wb_device_get_node_type, wb_receiver_disable, wb_receiver_enable,
+    wb_receiver_get_channel, wb_receiver_get_data, wb_receiver_get_data_size,
+    wb_receiver_get_emitter_direction, wb_receiver_get_queue_length,
+    wb_receiver_get_sampling_period, wb_receiver_get_signal_strength,
+    wb_receiver_next_packet, wb_receiver_set_channel, WbDeviceTag,
+    WbNodeType_WB_NODE_RECEIVER,
 };
 
 #[derive(Debug, Error)]
@@ -46,9 +48,11 @@ impl Receiver {
                 )
             }
             .to_vec();
-            let signal_strength = unsafe { wb_receiver_get_signal_strength(self.0) };
+            let signal_strength =
+                unsafe { wb_receiver_get_signal_strength(self.0) };
             let emitter_direction = unsafe {
-                let emitter_direction = wb_receiver_get_emitter_direction(self.0);
+                let emitter_direction =
+                    wb_receiver_get_emitter_direction(self.0);
                 if emitter_direction.is_null() {
                     return Err(ReceiverError::EmitterDirectionIsNull);
                 }

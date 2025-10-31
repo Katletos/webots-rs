@@ -2,10 +2,10 @@ use std::slice::from_raw_parts;
 
 use thiserror::Error;
 use webots_bindings::{
-    wb_accelerometer_disable, wb_accelerometer_enable, wb_accelerometer_get_lookup_table,
-    wb_accelerometer_get_lookup_table_size, wb_accelerometer_get_sampling_period,
-    wb_accelerometer_get_values, wb_device_get_node_type, WbDeviceTag,
-    WbNodeType_WB_NODE_ACCELEROMETER,
+    wb_accelerometer_disable, wb_accelerometer_enable,
+    wb_accelerometer_get_lookup_table, wb_accelerometer_get_lookup_table_size,
+    wb_accelerometer_get_sampling_period, wb_accelerometer_get_values,
+    wb_device_get_node_type, WbDeviceTag, WbNodeType_WB_NODE_ACCELEROMETER,
 };
 
 #[derive(Debug, Error)]

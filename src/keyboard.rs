@@ -1,5 +1,6 @@
 use webots_bindings::{
-    wb_keyboard_disable, wb_keyboard_enable, wb_keyboard_get_key, wb_keyboard_get_sampling_period,
+    wb_keyboard_disable, wb_keyboard_enable, wb_keyboard_get_key,
+    wb_keyboard_get_sampling_period,
 };
 
 pub struct Keyboard;

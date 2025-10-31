@@ -1,8 +1,9 @@
 use webots_bindings::{
-    wb_device_get_node_type, wb_position_sensor_disable, wb_position_sensor_enable,
-    wb_position_sensor_get_brake, wb_position_sensor_get_motor,
-    wb_position_sensor_get_sampling_period, wb_position_sensor_get_type,
-    wb_position_sensor_get_value, WbDeviceTag, WbNodeType_WB_NODE_POSITION_SENSOR,
+    wb_device_get_node_type, wb_position_sensor_disable,
+    wb_position_sensor_enable, wb_position_sensor_get_brake,
+    wb_position_sensor_get_motor, wb_position_sensor_get_sampling_period,
+    wb_position_sensor_get_type, wb_position_sensor_get_value, WbDeviceTag,
+    WbNodeType_WB_NODE_POSITION_SENSOR,
 };
 
 use crate::{Brake, JointType, Motor};

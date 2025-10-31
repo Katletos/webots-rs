@@ -1,5 +1,6 @@
 use webots_bindings::{
-    WbTouchSensorType_WB_TOUCH_SENSOR_BUMPER, WbTouchSensorType_WB_TOUCH_SENSOR_FORCE,
+    WbTouchSensorType_WB_TOUCH_SENSOR_BUMPER,
+    WbTouchSensorType_WB_TOUCH_SENSOR_FORCE,
     WbTouchSensorType_WB_TOUCH_SENSOR_FORCE3D,
 };
 
@@ -15,7 +16,9 @@ impl From<u32> for TouchSensorType {
         match other {
             WbTouchSensorType_WB_TOUCH_SENSOR_BUMPER => TouchSensorType::Bumber,
             WbTouchSensorType_WB_TOUCH_SENSOR_FORCE => TouchSensorType::Force,
-            WbTouchSensorType_WB_TOUCH_SENSOR_FORCE3D => TouchSensorType::Force3D,
+            WbTouchSensorType_WB_TOUCH_SENSOR_FORCE3D => {
+                TouchSensorType::Force3D
+            }
             _ => unreachable!(),
         }
     }
@@ -27,7 +30,9 @@ impl Into<u32> for TouchSensorType {
         match self {
             TouchSensorType::Bumber => WbTouchSensorType_WB_TOUCH_SENSOR_BUMPER,
             TouchSensorType::Force => WbTouchSensorType_WB_TOUCH_SENSOR_FORCE,
-            TouchSensorType::Force3D => WbTouchSensorType_WB_TOUCH_SENSOR_FORCE3D,
+            TouchSensorType::Force3D => {
+                WbTouchSensorType_WB_TOUCH_SENSOR_FORCE3D
+            }
         }
     }
 }
