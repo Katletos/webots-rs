@@ -38,9 +38,9 @@ impl PositionSensor {
         unsafe { wb_position_sensor_get_type(self.0).into() }
     }
 
-    pub fn get_motor(&self) -> Motor {
-        Motor::new(unsafe { wb_position_sensor_get_motor(self.0) })
-    }
+    // pub fn get_motor(&self) -> Motor {
+    //     Motor::new(unsafe { wb_position_sensor_get_motor(self.0) })
+    // }
 
     pub fn get_brake(&self) -> Brake {
         Brake::new(unsafe { wb_position_sensor_get_brake(self.0) })

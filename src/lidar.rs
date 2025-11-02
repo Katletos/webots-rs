@@ -27,9 +27,10 @@ impl Lidar {
         Self { tag, lock }
     }
 
-    pub fn enable(&self, sampling_period: i32) {
+    pub fn enable(&self, sampling_period: std::time::Duration) {
         self.lock.after_step(|| {
-            unsafe { wb_lidar_enable(self.tag, sampling_period) };
+            let ms = sampling_period.as_millis() as i32;
+            unsafe { wb_lidar_enable(self.tag, ms) };
         });
     }
 

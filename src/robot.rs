@@ -26,10 +26,13 @@ static ROBOT: std::sync::OnceLock<Robot> = std::sync::OnceLock::new();
 pub struct WorldLock;
 
 impl WorldLock {
+    // pub fn new() -> Self {}
     pub fn after_step<F, T>(&self, mut f: F) -> T
     where
         F: FnMut() -> T,
     {
+        // let tick_start = world_time();
+
         let robot = Robot::global();
 
         {
@@ -193,10 +196,10 @@ impl Robot {
         unsafe { wb_robot_battery_sensor_get_value() }
     }
 
-    pub fn get_accelerometer(name: &str) -> Accelerometer {
+    pub fn get_accelerometer(&self, name: &str) -> Accelerometer {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Accelerometer::new(device)
+        Accelerometer::new(device, WorldLock)
     }
 
     pub fn get_brake(name: &str) -> Brake {
@@ -217,10 +220,10 @@ impl Robot {
         Lidar::new(device, WorldLock)
     }
 
-    pub fn get_gps(name: &str) -> Gps {
+    pub fn get_gps(&self, name: &str) -> Gps {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Gps::new(device)
+        Gps::new(device, WorldLock)
     }
 
     pub fn get_distance_sensor(name: &str) -> DistanceSensor {
@@ -229,10 +232,10 @@ impl Robot {
         DistanceSensor::new(device)
     }
 
-    pub fn get_gyro(name: &str) -> Gyro {
+    pub fn get_gyro(&self, name: &str) -> Gyro {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Gyro::new(device)
+        Gyro::new(device, WorldLock)
     }
 
     pub fn get_inertial_unit(name: &str) -> InertialUnit {
@@ -245,10 +248,10 @@ impl Robot {
         Keyboard
     }
 
-    pub fn get_motor(name: &str) -> Motor {
+    pub fn get_motor(&self, name: &str) -> Motor {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Motor::new(device)
+        Motor::new(device, WorldLock)
     }
 
     pub fn get_position_sensor(name: &str) -> PositionSensor {
