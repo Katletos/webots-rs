@@ -20,6 +20,7 @@ fn main() {
         .current_dir(out_path.join("webots/src/controller/c").to_str().unwrap())
         .status()
         .expect("Failed to execute make process");
+
     if !status.success() {
         panic!("make process exited with {:?}", status.code());
     }
@@ -61,7 +62,9 @@ fn main() {
             Some(metadata) if metadata.is_file() => Some(entry),
             _ => None,
         })
-        .filter(|entry| !entry.path().starts_with("webots/src/controller/c/build"))
+        .filter(|entry| {
+            !entry.path().starts_with("webots/src/controller/c/build")
+        })
     {
         println!("cargo:rerun-if-changed={}", entry.path().display());
     }
@@ -85,6 +88,6 @@ fn main() {
         .expect("Failed to generate bindings");
 
     bindings
-        .write_to_file(out_path.join("webots_bindings.rs"))
+        .write_to_file(PathBuf::from("src").join("bindings.rs"))
         .expect("Failed to write bindings");
 }

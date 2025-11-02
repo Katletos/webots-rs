@@ -1,7 +1,14 @@
 [package]
 description = "Webots bindings for Rust"
 edition = "2021"
-exclude = ["/webots", "!/webots/Makefile", "!/webots/include", "!/webots/lib/controller", "!/webots/resources/Makefile*", "!/webots/src"]
+exclude = [
+	"/webots",
+	"!/webots/Makefile",
+	"!/webots/include",
+	"!/webots/lib/controller",
+	"!/webots/resources/Makefile*",
+	"!/webots/src",
+]
 homepage = "https://github.com/HULKs/webots-rs"
 license = "MIT"
 name = "webots-bindings"
@@ -9,4 +16,4 @@ version = "0.8.0"
 
 [build-dependencies]
 bindgen = "0.63"
-walkdir = "2.3.2"
+walkdir = "2.5.0"

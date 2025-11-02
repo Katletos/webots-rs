@@ -1,3 +1,4 @@
 [submodule "webots-bindings/webots"]
 	path = webots-bindings/webots
 	url = https://github.com/cyberbotics/webots.git
+	branch = master

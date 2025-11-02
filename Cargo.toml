@@ -8,4 +8,4 @@ version = "0.8.0"
 
 [dependencies]
 thiserror = "1.0.37"
-webots-bindings = {path = "webots-bindings", version = "0.8.0"}
+webots-bindings = { path = "webots-bindings", version = "0.8.0" }
