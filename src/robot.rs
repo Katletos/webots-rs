@@ -23,45 +23,79 @@ pub fn world_time() -> f64 {
 
 static ROBOT: std::sync::OnceLock<Robot> = std::sync::OnceLock::new();
 
-pub struct WorldLock;
+#[derive(Default)]
+pub struct WorldLock {
+    pub prev_tick: f64,
+}
 
 impl WorldLock {
-    // pub fn new() -> Self {}
-    pub fn after_step<F, T>(&self, mut f: F) -> T
+    pub fn new() -> Self {
+        //tick is always non-negative
+        //therefore -1.0 indicates "no previous tick"
+        Self { prev_tick: -1.0 }
+    }
+
+    pub fn after_step<F, T>(&mut self, mut f: F) -> T
     where
         F: FnMut() -> T,
     {
-        // let tick_start = world_time();
+        const EPSILON: f64 = 1e-7;
 
         let robot = Robot::global();
 
+        let output: T;
+
+        let in_same_tick = |prev: f64| -> bool {
+            let tick_start = world_time();
+
+            (tick_start - prev).abs() < EPSILON
+        };
+
         {
-            robot.world_tick.lock().unwrap().workers += 1;
-            let mut tick = robot
-                .condvar
-                .wait_while(robot.world_tick.lock().unwrap(), |tick| {
-                    tick.in_tick
-                })
+            let mut tick_guard = robot.world_tick.lock().unwrap();
+
+            if in_same_tick(self.prev_tick) {
+                tick_guard.wanted += 1;
+
+                tick_guard = robot
+                    .step_cond
+                    .wait_while(tick_guard, |_| in_same_tick(self.prev_tick))
+                    .unwrap();
+            } else {
+                tick_guard.started += 1;
+            }
+
+            tick_guard = robot
+                .step_cond
+                .wait_while(tick_guard, |tick| tick.in_tick)
                 .unwrap();
 
-            tick.workers -= 1;
+            output = f();
+
+            tick_guard.started -= 1;
+
+            self.prev_tick = world_time();
         }
 
-        robot.condvar.notify_all();
+        robot.workers_cond.notify_all();
 
-        f()
+        output
     }
 }
 
 struct WorldTick {
     in_tick: bool,
-    workers: usize,
+    wanted: usize,
+    started: usize,
 }
 
 pub struct Robot {
     init: Option<()>,
     world_tick: std::sync::Mutex<WorldTick>,
-    condvar: std::sync::Condvar,
+    //variable used to notify main thread after all workers are done
+    workers_cond: std::sync::Condvar,
+    //variable used to notify devices after step
+    step_cond: std::sync::Condvar,
 }
 
 impl Drop for Robot {
@@ -83,9 +117,11 @@ impl Robot {
             Robot {
                 world_tick: std::sync::Mutex::new(WorldTick {
                     in_tick: false,
-                    workers: 0,
+                    started: 0,
+                    wanted: 0,
                 }),
-                condvar: std::sync::Condvar::new(),
+                workers_cond: std::sync::Condvar::new(),
+                step_cond: std::sync::Condvar::new(),
                 init: Some(()),
             }
         })
@@ -96,14 +132,21 @@ impl Robot {
 
         let status = unsafe { wb_robot_step(duration) };
 
+        {
+            let mut tick = self.world_tick.lock().unwrap();
+            tick.in_tick = false;
+            tick.started += tick.wanted;
+            tick.wanted = 0;
+        }
+
         self.world_tick.lock().unwrap().in_tick = false;
 
-        self.condvar.notify_all();
+        self.step_cond.notify_all();
 
         let _tick = self
-            .condvar
+            .workers_cond
             .wait_while(self.world_tick.lock().unwrap(), |tick| {
-                tick.workers > 0
+                tick.started > 0
             })
             .unwrap();
 
@@ -199,7 +242,7 @@ impl Robot {
     pub fn get_accelerometer(&self, name: &str) -> Accelerometer {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Accelerometer::new(device, WorldLock)
+        Accelerometer::new(device, WorldLock::new())
     }
 
     pub fn get_brake(name: &str) -> Brake {
@@ -217,13 +260,13 @@ impl Robot {
     pub fn get_lidar(&self, name: &str) -> Lidar {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Lidar::new(device, WorldLock)
+        Lidar::new(device, WorldLock::new())
     }
 
     pub fn get_gps(&self, name: &str) -> Gps {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Gps::new(device, WorldLock)
+        Gps::new(device, WorldLock::new())
     }
 
     pub fn get_distance_sensor(name: &str) -> DistanceSensor {
@@ -235,7 +278,7 @@ impl Robot {
     pub fn get_gyro(&self, name: &str) -> Gyro {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Gyro::new(device, WorldLock)
+        Gyro::new(device, WorldLock::new())
     }
 
     pub fn get_inertial_unit(name: &str) -> InertialUnit {
@@ -251,7 +294,7 @@ impl Robot {
     pub fn get_motor(&self, name: &str) -> Motor {
         let name = CString::new(name).expect("CString::new failed");
         let device = unsafe { wb_robot_get_device(name.as_ptr()) };
-        Motor::new(device, WorldLock)
+        Motor::new(device, WorldLock::new())
     }
 
     pub fn get_position_sensor(name: &str) -> PositionSensor {

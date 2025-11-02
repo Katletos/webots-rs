@@ -30,21 +30,29 @@ impl Accelerometer {
         });
         Self { tag: device, lock }
     }
-    pub fn enable(&self, sampling_period: i32) {
-        self.lock.after_step(|| unsafe { wb_accelerometer_enable(self.tag, sampling_period) });
+    pub fn enable(&mut self, sampling_period: i32) {
+        self.lock.after_step(|| unsafe {
+            wb_accelerometer_enable(self.tag, sampling_period)
+        });
     }
-    pub fn disable(&self) {
-        self.lock.after_step(|| unsafe { wb_accelerometer_disable(self.tag) });
+    pub fn disable(&mut self) {
+        self.lock
+            .after_step(|| unsafe { wb_accelerometer_disable(self.tag) });
     }
-    pub fn get_sampling_period(&self) -> i32 {
-        self.lock.after_step(|| unsafe { wb_accelerometer_get_sampling_period(self.tag) })
+    pub fn get_sampling_period(&mut self) -> i32 {
+        self.lock.after_step(|| unsafe {
+            wb_accelerometer_get_sampling_period(self.tag)
+        })
     }
-    pub fn get_lookup_table_size(&self) -> i32 {
-        self.lock.after_step(|| unsafe { wb_accelerometer_get_lookup_table_size(self.tag) })
+    pub fn get_lookup_table_size(&mut self) -> i32 {
+        self.lock.after_step(|| unsafe {
+            wb_accelerometer_get_lookup_table_size(self.tag)
+        })
     }
-    pub fn get_lookup_table(&self) -> Result<&[f64], AccelerometerError> {
+    pub fn get_lookup_table(&mut self) -> Result<&[f64], AccelerometerError> {
         self.lock.after_step(|| {
-            let lookup_table_size = unsafe { wb_accelerometer_get_lookup_table_size(self.tag) };
+            let lookup_table_size =
+                unsafe { wb_accelerometer_get_lookup_table_size(self.tag) };
             unsafe {
                 let lookup_table = wb_accelerometer_get_lookup_table(self.tag);
                 if lookup_table.is_null() {
@@ -54,7 +62,7 @@ impl Accelerometer {
             }
         })
     }
-    pub fn get_values(&self) -> Result<[f64; 3], AccelerometerError> {
+    pub fn get_values(&mut self) -> Result<[f64; 3], AccelerometerError> {
         self.lock.after_step(|| unsafe {
             let values = wb_accelerometer_get_values(self.tag);
             if values.is_null() {

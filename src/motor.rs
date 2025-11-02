@@ -33,137 +33,137 @@ impl Motor {
         });
         Self { tag: device, lock }
     }
-    pub fn set_position(&self, position: f64) {
+    pub fn set_position(&mut self, position: f64) {
         self.lock.after_step(|| unsafe {
             wb_motor_set_position(self.tag, position)
         });
     }
-    pub fn set_acceleration(&self, acceleration: f64) {
+    pub fn set_acceleration(&mut self, acceleration: f64) {
         self.lock.after_step(|| unsafe {
             wb_motor_set_acceleration(self.tag, acceleration)
         });
     }
-    pub fn set_velocity(&self, velocity: f64) {
+    pub fn set_velocity(&mut self, velocity: f64) {
         self.lock.after_step(|| unsafe {
             wb_motor_set_velocity(self.tag, velocity)
         });
     }
-    pub fn set_force(&self, force: f64) {
+    pub fn set_force(&mut self, force: f64) {
         self.lock
             .after_step(|| unsafe { wb_motor_set_force(self.tag, force) });
     }
-    pub fn set_torque(&self, torque: f64) {
+    pub fn set_torque(&mut self, torque: f64) {
         self.lock
             .after_step(|| unsafe { wb_motor_set_torque(self.tag, torque) });
     }
-    pub fn set_available_force(&self, available_force: f64) {
+    pub fn set_available_force(&mut self, available_force: f64) {
         self.lock.after_step(|| unsafe {
             wb_motor_set_available_force(self.tag, available_force)
         });
     }
-    pub fn set_available_torque(&self, available_torque: f64) {
+    pub fn set_available_torque(&mut self, available_torque: f64) {
         self.lock.after_step(|| unsafe {
             wb_motor_set_available_torque(self.tag, available_torque)
         });
     }
-    pub fn set_control_pid(&self, p: f64, i: f64, d: f64) {
+    pub fn set_control_pid(&mut self, p: f64, i: f64, d: f64) {
         self.lock.after_step(|| unsafe {
             wb_motor_set_control_pid(self.tag, p, i, d)
         });
     }
-    pub fn enable_force_feedback(&self, sampling_period: i32) {
+    pub fn enable_force_feedback(&mut self, sampling_period: i32) {
         self.lock.after_step(|| unsafe {
             wb_motor_enable_force_feedback(self.tag, sampling_period)
         });
     }
-    pub fn disable_force_feedback(&self) {
+    pub fn disable_force_feedback(&mut self) {
         self.lock.after_step(|| unsafe {
             wb_motor_disable_force_feedback(self.tag)
         });
     }
-    pub fn get_force_feedback_sampling_period(&self) -> i32 {
+    pub fn get_force_feedback_sampling_period(&mut self) -> i32 {
         self.lock.after_step(|| unsafe {
             wb_motor_get_force_feedback_sampling_period(self.tag)
         })
     }
-    pub fn get_force_feedback(&self) -> f64 {
+    pub fn get_force_feedback(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_force_feedback(self.tag) })
     }
-    pub fn enable_torque_feedback(&self, sampling_period: i32) {
+    pub fn enable_torque_feedback(&mut self, sampling_period: i32) {
         self.lock.after_step(|| unsafe {
             wb_motor_enable_torque_feedback(self.tag, sampling_period)
         });
     }
-    pub fn disable_torque_feedback(&self) {
+    pub fn disable_torque_feedback(&mut self) {
         self.lock.after_step(|| unsafe {
             wb_motor_disable_torque_feedback(self.tag)
         });
     }
-    pub fn get_torque_feedback_sampling_period(&self) -> i32 {
+    pub fn get_torque_feedback_sampling_period(&mut self) -> i32 {
         self.lock.after_step(|| unsafe {
             wb_motor_get_torque_feedback_sampling_period(self.tag)
         })
     }
-    pub fn get_torque_feedback(&self) -> f64 {
+    pub fn get_torque_feedback(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_torque_feedback(self.tag) })
     }
-    pub fn get_type(&self) -> JointType {
+    pub fn get_type(&mut self) -> JointType {
         self.lock
             .after_step(|| unsafe { wb_motor_get_type(self.tag).into() })
     }
-    pub fn get_target_position(&self) -> f64 {
+    pub fn get_target_position(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_target_position(self.tag) })
     }
-    pub fn get_min_position(&self) -> f64 {
+    pub fn get_min_position(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_min_position(self.tag) })
     }
-    pub fn get_max_position(&self) -> f64 {
+    pub fn get_max_position(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_max_position(self.tag) })
     }
-    pub fn get_velocity(&self) -> f64 {
+    pub fn get_velocity(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_velocity(self.tag) })
     }
-    pub fn get_max_velocity(&self) -> f64 {
+    pub fn get_max_velocity(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_max_velocity(self.tag) })
     }
-    pub fn get_acceleration(&self) -> f64 {
+    pub fn get_acceleration(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_acceleration(self.tag) })
     }
-    pub fn get_available_force(&self) -> f64 {
+    pub fn get_available_force(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_available_force(self.tag) })
     }
-    pub fn get_max_force(&self) -> f64 {
+    pub fn get_max_force(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_max_force(self.tag) })
     }
-    pub fn get_available_torque(&self) -> f64 {
+    pub fn get_available_torque(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_available_torque(self.tag) })
     }
-    pub fn get_max_torque(&self) -> f64 {
+    pub fn get_max_torque(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_max_torque(self.tag) })
     }
-    pub fn get_multiplier(&self) -> f64 {
+    pub fn get_multiplier(&mut self) -> f64 {
         self.lock
             .after_step(|| unsafe { wb_motor_get_multiplier(self.tag) })
     }
-    pub fn get_brake(&self) -> Brake {
+    pub fn get_brake(&mut self) -> Brake {
         Brake::new(
             self.lock
                 .after_step(|| unsafe { wb_motor_get_brake(self.tag) }),
         )
     }
-    pub fn get_position_sensor(&self) -> PositionSensor {
+    pub fn get_position_sensor(&mut self) -> PositionSensor {
         PositionSensor::new(
             self.lock.after_step(|| unsafe {
                 wb_motor_get_position_sensor(self.tag)

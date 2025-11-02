@@ -27,19 +27,19 @@ impl Lidar {
         Self { tag, lock }
     }
 
-    pub fn enable(&self, sampling_period: std::time::Duration) {
+    pub fn enable(&mut self, sampling_period: std::time::Duration) {
         self.lock.after_step(|| {
             let ms = sampling_period.as_millis() as i32;
             unsafe { wb_lidar_enable(self.tag, ms) };
         });
     }
 
-    pub fn disable(&self) {
+    pub fn disable(&mut self) {
         self.lock
             .after_step(|| unsafe { wb_lidar_disable(self.tag) });
     }
 
-    pub fn get_values(&self) -> Result<Vec<f32>, LidarError> {
+    pub fn get_values(&mut self) -> Result<Vec<f32>, LidarError> {
         self.lock.after_step(|| unsafe {
             let size = wb_lidar_get_horizontal_resolution(self.tag);
             let ptr = wb_lidar_get_range_image(self.tag);

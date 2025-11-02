@@ -28,7 +28,7 @@ pub use gyro::Gyro;
 pub use inertial_unit::InertialUnit;
 pub use joint_type::JointType;
 pub use keyboard::Keyboard;
-pub use lidar::Lidar;
+pub use lidar::{Lidar, LidarError};
 pub use motor::Motor;
 pub use position_sensor::PositionSensor;
 pub use receiver::{Packet, Receiver};

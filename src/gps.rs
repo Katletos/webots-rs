@@ -24,14 +24,14 @@ impl Gps {
         });
         Self { tag: device, lock }
     }
-    pub fn enable(&self, sampling_period: i32) {
+    pub fn enable(&mut self, sampling_period: i32) {
         self.lock
             .after_step(|| unsafe { wb_gps_enable(self.tag, sampling_period) });
     }
-    pub fn disable(&self) {
+    pub fn disable(&mut self) {
         self.lock.after_step(|| unsafe { wb_gps_disable(self.tag) });
     }
-    pub fn get_values(&self) -> Result<[f64; 3], GpsError> {
+    pub fn get_values(&mut self) -> Result<[f64; 3], GpsError> {
         self.lock.after_step(|| unsafe {
             let values = wb_gps_get_values(self.tag);
             if values.is_null() {
