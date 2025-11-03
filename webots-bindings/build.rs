@@ -1,93 +1,71 @@
-use std::{env, path::PathBuf, process::Command};
+use std::env;
+use std::path::PathBuf;
 
-use walkdir::WalkDir;
+static WEBOTS_LINUX_PATH: &str = "/usr/local/webots";
+static WEBOTS_MACOS_PATH: &str = "/Applications/Webots.app";
+static WEBOTS_WINDOWS_PATH: &str = "C:\\Program Files\\Webots";
 
 fn main() {
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    // let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    //
+    let env_path = env::var("WEBOTS_HOME").ok();
 
-    let status = Command::new("cp")
-        .args(["-R", "webots/", out_path.join("./").to_str().unwrap()])
-        .status()
-        .expect("Failed to execute rsync process");
+    let webots_path = if let Some(path) = env_path {
+        path
+    } else if cfg!(target_os = "linux") {
+        WEBOTS_LINUX_PATH.to_string()
+    } else if cfg!(target_os = "macos") {
+        WEBOTS_MACOS_PATH.to_string()
+    } else if cfg!(target_os = "windows") {
+        WEBOTS_WINDOWS_PATH.to_string()
+    } else {
+        panic!(
+            "Unrecognized OS. Please set WEBOTS_PATH so that we can find your Webots installation."
+        );
+    };
 
-    if !status.success() {
-        panic!("cp process exited with {:?}", status.code());
-    }
+    // let status = std::process::Command::new("cp")
+    //     .args([
+    //         "-R",
+    //         &format!("{}/.", webots_path.as_str()),
+    //         out_path.join("./").to_str().unwrap(),
+    //     ])
+    //     .status()
+    //     .expect("Failed to execute rsync process");
+    //
+    // if !status.success() {
+    //     panic!("cp process exited with {:?}", status.code());
+    // }
 
-    let status = Command::new("make")
-        .args(["release"])
-        .env("WEBOTS_HOME", "../../..")
-        .current_dir(out_path.join("webots/src/controller/c").to_str().unwrap())
-        .status()
-        .expect("Failed to execute make process");
+    let lib_path = PathBuf::from(&webots_path).join("lib/controller");
+    let include_path = PathBuf::from(&webots_path).join("include/controller/c");
 
-    if !status.success() {
-        panic!("make process exited with {:?}", status.code());
-    }
-
-    println!(
-        "cargo:rustc-link-search={}",
-        out_path.join("webots/lib/controller").display()
-    );
+    println!("cargo:rustc-link-search={}", lib_path.display());
     println!("cargo:rustc-link-lib=Controller");
-    println!(
-        "cargo:rustc-env=LD_LIBRARY_PATH={}",
-        out_path.join("webots/lib/controller").display()
-    );
+    println!("cargo:rustc-env=LD_LIBRARY_PATH={}", lib_path.display());
     println!("cargo:rerun-if-changed=wrapper.h");
-    for entry in WalkDir::new("webots/include")
-        .into_iter()
-        .filter_map(|entry| entry.ok())
-        .filter_map(|entry| match entry.metadata().ok() {
-            Some(metadata) if metadata.is_file() => Some(entry),
-            _ => None,
-        })
-    {
-        println!("cargo:rerun-if-changed={}", entry.path().display());
-    }
-    for entry in WalkDir::new("webots/resources")
-        .into_iter()
-        .filter_map(|entry| entry.ok())
-        .filter_map(|entry| match entry.metadata().ok() {
-            Some(metadata) if metadata.is_file() => Some(entry),
-            _ => None,
-        })
-    {
-        println!("cargo:rerun-if-changed={}", entry.path().display());
-    }
-    for entry in WalkDir::new("webots/src")
-        .into_iter()
-        .filter_map(|entry| entry.ok())
-        .filter_map(|entry| match entry.metadata().ok() {
-            Some(metadata) if metadata.is_file() => Some(entry),
-            _ => None,
-        })
-        .filter(|entry| {
-            !entry.path().starts_with("webots/src/controller/c/build")
-        })
-    {
-        println!("cargo:rerun-if-changed={}", entry.path().display());
-    }
+
+    let clang_args = [
+        "-I",
+        include_path.to_str().unwrap(),
+        #[cfg(target_arch = "x86_64")]
+        "--target=x86_64-unknown-linux-gnu",
+    ];
 
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")
-        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
-        .clang_args(vec![
-            "-I",
-            out_path
-                .join("webots/include/controller/c")
-                .to_str()
-                .unwrap(),
-        ])
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
+        .clang_args(clang_args)
         .blocklist_item("FP_INFINITE")
         .blocklist_item("FP_NAN")
         .blocklist_item("FP_NORMAL")
         .blocklist_item("FP_SUBNORMAL")
         .blocklist_item("FP_ZERO")
         .generate()
-        .expect("Failed to generate bindings");
+        .expect("Unable to generate bindings");
 
+    let out_path = PathBuf::from("src");
     bindings
-        .write_to_file(PathBuf::from("src").join("bindings.rs"))
-        .expect("Failed to write bindings");
+        .write_to_file(out_path.join("bindings.rs"))
+        .expect("Unable to write bindings");
 }

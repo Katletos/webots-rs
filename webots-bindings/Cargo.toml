@@ -15,5 +15,5 @@ name = "webots-bindings"
 version = "0.8.0"
 
 [build-dependencies]
-bindgen = "0.63"
+bindgen = "0.70"
 walkdir = "2.5.0"
