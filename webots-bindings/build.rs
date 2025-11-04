@@ -42,7 +42,6 @@ fn main() {
 
     println!("cargo:rustc-link-search={}", lib_path.display());
     println!("cargo:rustc-link-lib=Controller");
-    println!("cargo:rustc-env=LD_LIBRARY_PATH={}", lib_path.display());
     println!("cargo:rerun-if-changed=wrapper.h");
 
     let clang_args = [
